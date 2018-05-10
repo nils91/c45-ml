@@ -1,13 +1,7 @@
 package de.dralle;
 
-public class DiscreteFeature<T> implements IFeature<T> {
-
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+public class DiscreteFeature<T> extends AbstractFeature<T> {
+	
 	@Override
 	public FeatureType getFeatureType() {
 		return FeatureType.Discrete;

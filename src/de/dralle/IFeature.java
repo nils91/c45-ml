@@ -1,6 +1,6 @@
 package de.dralle;
 
-public interface IFeature {
+public interface IFeature<T> {
 	String getName();
 	FeatureType getFeatureType();
 }

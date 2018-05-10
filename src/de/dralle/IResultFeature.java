@@ -1,6 +1,6 @@
 package de.dralle;
 
-public interface IResultFeature extends IFeature {
+public interface IResultFeature<T> extends IFeature<T> {
 
 	
 

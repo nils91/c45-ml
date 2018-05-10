@@ -1,6 +1,6 @@
 package de.dralle;
 
-public class ContinuousFeature implements IFeature {
+public class ContinuousFeature<T extends Number> implements IFeature<T> {
 
 	@Override
 	public String getName() {

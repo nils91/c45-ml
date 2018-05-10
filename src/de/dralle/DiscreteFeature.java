@@ -1,6 +1,6 @@
 package de.dralle;
 
-public class DiscreteFeature implements IFeature {
+public class DiscreteFeature<T> implements IFeature<T> {
 
 	@Override
 	public String getName() {

@@ -8,7 +8,20 @@ public class DataSet {
 	public void setFeature(AbstractFeature<?> f, int index) {
 		features[index]=f;
 	}
+	public AbstractFeature<?> getFeature(int index) {
+		return features[index];
+	}
 	private List<FeatureVector> data;
+	public AbstractFeature<?>[] getFeatures() {
+		return features;
+	}
+	public List<FeatureVector> getData() {
+		return data;
+	}
+	public int addFeatureVector(FeatureVector e) {
+		data.add(e);
+		return data.size();
+	}
 	public DataSet() {
 		super();
 		this.data = new ArrayList<>();

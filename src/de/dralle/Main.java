@@ -22,7 +22,6 @@ public class Main {
 		logHandler.setLevel(Level.ALL);
 		LOGGER.addHandler(logHandler);
 		List<Feature> allFeatures = new ArrayList<>();
-		Feature resultFeature = new Feature();
 		File f = new File(".\\testdata\\ID3_Beispieldaten.csv");
 		if (f.exists()) {
 			LOGGER.log(Level.CONFIG, "File exists");
@@ -65,16 +64,28 @@ public class Main {
 			}
 			LOGGER.log(Level.CONFIG, features.length + " features");
 			LOGGER.log(Level.CONFIG, featureVectors.size() + " feature vectors");
+			DataSet trainDataSet=new DataSet();
+			trainDataSet.setSize(features.length);
+			DiscrceteResultFeature<String> resultFeature=new DiscrceteResultFeature<>();
 			resultFeature.setName(features[features.length - 1]);
-			for (int i = 0; i < features.length - 1; i++) {
-				Feature newFeature = new Feature(features[i]);
-				allFeatures.add(newFeature);
-
-				for (int j = 0; j < featureVectors.size(); j++) {
-					String[] vector = featureVectors.get(j);
-					newFeature.addValue(vector[i]);
-
+			trainDataSet.setFeature(resultFeature, features.length-1);
+			for (int i = 0; i < features.length-1; i++) {
+				DiscreteFeature<String> feature=new DiscreteFeature<>();
+				feature.setName(features[i]);
+				trainDataSet.setFeature(feature, i);
+			}
+			for (int i = 0; i < featureVectors.size(); i++) {
+				String[] values = featureVectors.get(i);
+				FeatureVector vector=new FeatureVector();
+				vector.setSize(values.length);
+				for (int j = 0; j < values.length; j++) {
+					Value<String> value=new Value<>(values[j]);
+					value.setFeature(trainDataSet.getFeature(j));
+					trainDataSet.getFeature(j).addValue(value);
+					vector.setFeature(trainDataSet.getFeature(j), j);
+					vector.setValue(value, j);
 				}
+				trainDataSet.addFeatureVector(vector);
 			}
 			LOGGER.log(Level.CONFIG, "Result feature set to " + resultFeature.getName());
 

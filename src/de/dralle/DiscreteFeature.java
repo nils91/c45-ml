@@ -8,4 +8,14 @@ public class DiscreteFeature<T> extends AbstractFeature<T> {
 		return FeatureType.Discrete;
 	}
 
+	public DiscreteFeature() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public DiscreteFeature(String name) {
+		super(name);
+		// TODO Auto-generated constructor stub
+	}
+
 }

@@ -21,7 +21,6 @@ public class Main {
 		ConsoleHandler logHandler = new ConsoleHandler();
 		logHandler.setLevel(Level.ALL);
 		LOGGER.addHandler(logHandler);
-		List<Feature> allFeatures = new ArrayList<>();
 		File f = new File(".\\testdata\\ID3_Beispieldaten.csv");
 		if (f.exists()) {
 			LOGGER.log(Level.CONFIG, "File exists");

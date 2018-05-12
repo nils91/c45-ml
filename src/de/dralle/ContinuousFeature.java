@@ -55,5 +55,9 @@ public class ContinuousFeature<T extends Number> extends AbstractFeature<T> {
 	public FeatureType getFeatureType() {		
 		return FeatureType.Continuous;
 	}
+	@Override
+	public AbstractFeature<?> copy() {
+		return new ContinuousFeature<>(getName());
+	}
 
 }

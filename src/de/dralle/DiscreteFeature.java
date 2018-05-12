@@ -18,4 +18,9 @@ public class DiscreteFeature<T> extends AbstractFeature<T> {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
+	public AbstractFeature<?> copy() {
+		return new DiscreteFeature<>(getName());
+	}
+
 }

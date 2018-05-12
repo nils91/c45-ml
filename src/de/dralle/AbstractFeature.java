@@ -58,8 +58,9 @@ public abstract class AbstractFeature<T> implements IFeature<T> {
 		double gain = fullDataSetEntropy;
 		Set<Value<?>> distinctValues = getDistinctValues();
 		for (Value<?> value : distinctValues) {
-			DataSet subset=d.splitDiscrete(d.getFeatureIndex(this), value)[0];
-			gain-=(countValue(value)/(double)d.getData().size())*subset.getEntropy();
+			int featureIndex=d.getFeatureIndex(this);
+			DataSet subset=d.splitDiscrete(featureIndex, value)[0];
+			gain-=(subset.getFeature(featureIndex).countValue(value)/(double)d.getData().size())*subset.getEntropy();
 		}
 		return gain;
 	}
@@ -72,10 +73,14 @@ public abstract class AbstractFeature<T> implements IFeature<T> {
 		return intrinsicValue;
 	}
 	public double getInformationGainRatio(DataSet d) {
+		double informationGain=getInformationGain(d);
+		if(informationGain==0) {
+			return 0;
+		}
 		return getIntrinsicValue()/getInformationGain(d);
 	}
 
-	public IValue<?> getMostCommonValue(){
+	public Value<?> getMostCommonValue(){
 		Value<?> val=null;
 		int valueCnt=0;
 		Set<Value<?>> distinctValues = getDistinctValues();
@@ -87,6 +92,8 @@ public abstract class AbstractFeature<T> implements IFeature<T> {
 		}
 		return val;
 	}
+
+	public abstract AbstractFeature<?> copy();
 	
 
 }

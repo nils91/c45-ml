@@ -38,18 +38,22 @@ public class Value<T> implements IValue<T> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {		
-		return super.equals(obj);
+	public boolean equals(Object obj) {
+		boolean equal=false;
+		if(obj instanceof Value<?>) {
+			equal=value.equals(((Value<?>)obj).getValue());
+		}
+		return super.equals(obj)||value.equals(obj)||equal;
 	}
 
 	@Override
 	public int hashCode() {
-		return super.hashCode();
+		return value.hashCode();
 	}
 
 	@Override
 	public String toString() {
-		return super.toString();
+		return value.toString();
 	}
 
 }

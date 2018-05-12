@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.xml.internal.ws.api.FeatureConstructor;
+
 import de.dralle.util.math.MathExtensions;
 
 public class DataSet {
@@ -18,9 +20,11 @@ public class DataSet {
 	public AbstractFeature<?> getFeature(int index) {
 		return features[index];
 	}
-	public AbstractFeature<?> getResultFeature(){
-		return features[features.length-1];
+
+	public AbstractFeature<?> getResultFeature() {
+		return features[features.length - 1];
 	}
+
 	private List<FeatureVector> data;
 
 	public AbstractFeature<?>[] getFeatures() {
@@ -46,35 +50,59 @@ public class DataSet {
 	}
 
 	public DataSet removeFeature(int index) {
+		// copy dataset
+		DataSet dataSetCopy = copy();
+
 		DataSet newDataSet = new DataSet();
-		newDataSet.setSize(getSize() - 1);
+		newDataSet.setSize(dataSetCopy.getSize() - 1);
 		// remove from features
-		for (int i = 0; i < features.length - 1; i++) {
+		for (int i = 0; i < dataSetCopy.features.length - 1; i++) {
 			if (i < index) {
-				newDataSet.setFeature(features[i], i);
+				newDataSet.setFeature(dataSetCopy.features[i].copy(), i);
 			}
 			if (i >= index) {
-				newDataSet.setFeature(features[i + 1], i);
+				newDataSet.setFeature(dataSetCopy.features[i + 1].copy(), i);
 			}
 		}
 		// remove from data
-		for (int i = 0; i < data.size(); i++) {
-			FeatureVector fVector = data.get(i);
-			newDataSet.addFeatureVector(fVector.removeFeature(index));
+		for (int i = 0; i < dataSetCopy.getData().size(); i++) {
+			FeatureVector fVector = dataSetCopy.data.get(i);
+			FeatureVector featureRemoved = fVector.removeFeature(index);
+			FeatureVector newVectorAdjustedToNewDataSet=featureRemoved.copyToDataSet(newDataSet);
+			newDataSet.addFeatureVector(newVectorAdjustedToNewDataSet);
 		}
 		return newDataSet;
 	}
 
+	private DataSet copy() {
+		DataSet copy = new DataSet();
+		copy.setSize(getSize());
+		// copy features
+		for (int i = 0; i < features.length; i++) {
+			copy.setFeature(features[i].copy(), i);
+		}
+		// copy values
+		for (int i = 0; i < data.size(); i++) {
+			FeatureVector rowVector = data.get(i);
+			FeatureVector newVector = rowVector.copyToDataSet(copy);
+			copy.addFeatureVector(newVector);
+		}
+		return copy;
+	}
+
 	public DataSet[] splitDiscrete(int featureIndex) {
-		AbstractFeature<?> featureToSplitAt = features[featureIndex];
+		// copy dataset
+		DataSet dataSetCopy = copy();
+
+		AbstractFeature<?> featureToSplitAt = dataSetCopy.features[featureIndex];
 		Set<Value<?>> distinctFeatureValues = featureToSplitAt.getDistinctValues();
 		DataSet[] newDataSets = new DataSet[featureToSplitAt.getDistinctValueCount()];
 		for (int i = 0; i < newDataSets.length; i++) {
 			DataSet newDataSet = new DataSet();
-			newDataSet.setSize(getSize());
+			newDataSet.setSize(dataSetCopy.getSize());
 			// features
-			for (int j = 0; j < features.length; j++) {
-				newDataSet.setFeature(features[j], j);
+			for (int j = 0; j < dataSetCopy.features.length; j++) {
+				newDataSet.setFeature(dataSetCopy.features[j].copy(), j);
 			}
 			newDataSets[i] = newDataSet;
 		}
@@ -83,24 +111,33 @@ public class DataSet {
 		for (Value<?> value : distinctFeatureValues) {
 			DataSet curSet = newDataSets[curDataSetIndex];
 			curDataSetIndex++;
-			for (int i = 0; i < data.size(); i++) {
-				FeatureVector vec = data.get(i);
+			for (int i = 0; i < dataSetCopy.data.size(); i++) {
+				FeatureVector vec = dataSetCopy.data.get(i);				
+
 				if (vec.getValue(featureIndex).getValue().equals(value.getValue())) {
 					curSet.addFeatureVector(vec);
 				}
+			}
+			AbstractFeature<?>[] updatedFeatures=curSet.updateFeatures();
+			for (int i = 0; i < curSet.data.size(); i++) {
+				FeatureVector vec = curSet.data.get(i);
+				vec.updateFeatures(updatedFeatures);
 			}
 		}
 		return newDataSets;
 	}
 
+
 	public DataSet[] splitDiscrete(int featureIndex, Object value) {
+		// copy dataset
+		DataSet dataSetCopy = copy();
 		DataSet[] newDataSets = new DataSet[2];
 		for (int i = 0; i < newDataSets.length; i++) {
 			DataSet newDataSet = new DataSet();
-			newDataSet.setSize(getSize());
+			newDataSet.setSize(dataSetCopy.getSize());
 			// features
-			for (int j = 0; j < features.length; j++) {
-				newDataSet.setFeature(features[j], j);
+			for (int j = 0; j < dataSetCopy.features.length; j++) {
+				newDataSet.setFeature(dataSetCopy.features[j].copy(), j);
 			}
 			newDataSets[i] = newDataSet;
 		}
@@ -108,14 +145,22 @@ public class DataSet {
 
 		for (int j = 0; j < newDataSets.length; j++) {
 			DataSet curSet = newDataSets[j];
-			for (int i = 0; i < data.size(); i++) {
-				FeatureVector vec = data.get(i);
-				if (j == 0 && vec.getValue(featureIndex).getValue().equals(value)) {
+			for (int i = 0; i < dataSetCopy.data.size(); i++) {
+				FeatureVector vec = dataSetCopy.data.get(i);
+
+				
+
+				if (j == 0 && vec.getValue(featureIndex).equals(value)) {
 					curSet.addFeatureVector(vec);
 				}
-				if (j == 1 && !vec.getValue(featureIndex).getValue().equals(value)) {
+				if (j == 1 && !vec.getValue(featureIndex).equals(value)) {
 					curSet.addFeatureVector(vec);
 				}
+			}
+			AbstractFeature<?>[] updatedFeatures=curSet.updateFeatures();
+			for (int i = 0; i < curSet.data.size(); i++) {
+				FeatureVector vec = curSet.data.get(i);
+				vec.updateFeatures(updatedFeatures);
 			}
 		}
 		return newDataSets;
@@ -130,13 +175,15 @@ public class DataSet {
 	public DataSet[] splitContinuous(int featureIndex, Number value) {
 		AbstractFeature<?> featureToSplitAt = features[featureIndex];
 		if (featureToSplitAt instanceof ContinuousFeature<?>) {
+			// copy dataset
+			DataSet dataSetCopy = copy();
 			DataSet[] newDataSets = new DataSet[2];
 			for (int i = 0; i < newDataSets.length; i++) {
 				DataSet newDataSet = new DataSet();
-				newDataSet.setSize(getSize());
+				newDataSet.setSize(dataSetCopy.getSize());
 				// features
-				for (int j = 0; j < features.length; j++) {
-					newDataSet.setFeature(features[j], j);
+				for (int j = 0; j < dataSetCopy.features.length; j++) {
+					newDataSet.setFeature(dataSetCopy.features[j].copy(), j);
 				}
 				newDataSets[i] = newDataSet;
 			}
@@ -144,8 +191,9 @@ public class DataSet {
 
 			for (int j = 0; j < newDataSets.length; j++) {
 				DataSet curSet = newDataSets[j];
-				for (int i = 0; i < data.size(); i++) {
-					FeatureVector vec = data.get(i);
+				for (int i = 0; i < dataSetCopy.data.size(); i++) {
+					FeatureVector vec = dataSetCopy.data.get(i);					
+
 					Object val = vec.getValue(featureIndex).getValue();
 					if (val instanceof Number) {
 						Number numVal = (Number) val;
@@ -158,41 +206,61 @@ public class DataSet {
 					}
 
 				}
+				AbstractFeature<?>[] updatedFeatures=curSet.updateFeatures();
+				for (int i = 0; i < curSet.data.size(); i++) {
+					FeatureVector vec = curSet.data.get(i);
+					vec.updateFeatures(updatedFeatures);
+				}
 			}
 			return newDataSets;
 		}
 		return null;
 	}
 
+	private AbstractFeature<?>[] updateFeatures() {
+		AbstractFeature<?>[] updatedFeatures=new AbstractFeature<?>[features.length];
+		for (int i = 0; i < features.length; i++) {
+			AbstractFeature<?> copy = features[i].copy();
+			for (int j = 0; j < data.size(); j++) {
+				copy.addValue(data.get(j).getValue(i));
+			}
+			updatedFeatures[i]=copy;
+		}
+		features=updatedFeatures;
+		return updatedFeatures;
+	}
+
 	public int getSize() {
 		return features.length;
 	}
+
 	public double getEntropy() {
 		double entropy = 0;
 		int cntTotal = data.size();
-		//last feature is result
-		AbstractFeature<?> resultFeature = features[features.length-1];
+		// last feature is result
+		AbstractFeature<?> resultFeature = features[features.length - 1];
 		Set<Value<?>> distinctValues = resultFeature.getDistinctValues();
 		for (Value<?> value : distinctValues) {
-			int cnt=resultFeature.countValue(value);
-			double frac=cnt/(double)cntTotal;
-			entropy+=(-frac*MathExtensions.log2(frac));
+			int cnt = resultFeature.countValue(value);
+			double frac = cnt / (double) cntTotal;
+			entropy += (-frac * MathExtensions.log2(frac));
 		}
 		return entropy;
 	}
 
 	public int getFeatureIndex(AbstractFeature<?> abstractFeature) {
 		for (int i = 0; i < features.length; i++) {
-			if(features[i].equals(abstractFeature)) {
+			if (features[i].equals(abstractFeature)) {
 				return i;
 			}
 		}
 		return -1;
 	}
+
 	public AbstractFeature<?> getMostDecidingFeature() {
 		AbstractFeature<?> objectivlyBestFeature = null;
 		double featureInformationGain = 0;
-		for (int i = 0; i < features.length; i++) {
+		for (int i = 0; i < features.length-1; i++) { //exclude result feature
 			double gain = features[i].getInformationGain(this);
 			if (gain > featureInformationGain) {
 				objectivlyBestFeature = features[i];
@@ -201,10 +269,12 @@ public class DataSet {
 		}
 		return objectivlyBestFeature;
 	}
+
 	public int getMostDecidingFeatureIndex() {
 		return getFeatureIndex(getMostDecidingFeature());
 	}
-	public IValue<?> getMostCommonResult(){
+
+	public Value<?> getMostCommonResult() {
 		return getResultFeature().getMostCommonValue();
 	}
 //	public DataSet removeFeature(AbstractFeature<?> feature) {

@@ -12,4 +12,9 @@ public class DiscrceteResultFeature<T> extends DiscreteFeature<T> implements IRe
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
+	public AbstractFeature<?> copy() {		
+		return new DiscrceteResultFeature<>(getName());
+	}
+
 }

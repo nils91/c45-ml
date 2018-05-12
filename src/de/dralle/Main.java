@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,10 +20,10 @@ public class Main {
 	private final static Logger LOGGER = Logger.getLogger(Main.class.getName());
 
 	public static void main(String[] args) {
-		LOGGER.setLevel(Level.ALL);
+		Logger.getGlobal().setLevel(Level.ALL);
 		ConsoleHandler logHandler = new ConsoleHandler();
 		logHandler.setLevel(Level.ALL);
-		LOGGER.addHandler(logHandler);
+		Logger.getGlobal().addHandler(logHandler);
 		File f = new File(".\\testdata\\ID3_Beispieldaten.csv");
 		if (f.exists()) {
 			LOGGER.log(Level.CONFIG, "File exists");
@@ -87,6 +90,14 @@ public class Main {
 				trainDataSet.addFeatureVector(vector);
 			}
 			LOGGER.log(Level.CONFIG, "Result feature set to " + resultFeature.getName());
+			
+			ID3Node node=new ID3Node();
+			node.learn(trainDataSet);
+			
+			LOGGER.log(Level.INFO, "ID3 tree learned");
+			
+			TreePrinter tp=new TreePrinter(System.out);
+			tp.print(node);
 
 		}
 	}

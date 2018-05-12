@@ -72,12 +72,8 @@ public abstract class AbstractFeature<T> implements IFeature<T> {
 		}
 		return intrinsicValue;
 	}
-	public double getInformationGainRatio(DataSet d) {
-		double informationGain=getInformationGain(d);
-		if(informationGain==0) {
-			return 0;
-		}
-		return getIntrinsicValue()/getInformationGain(d);
+	public double getInformationGainRatio(DataSet d) {		
+		return getInformationGain(d)/getIntrinsicValue();
 	}
 
 	public Value<?> getMostCommonValue(){

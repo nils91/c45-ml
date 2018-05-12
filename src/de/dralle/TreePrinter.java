@@ -18,33 +18,99 @@ public class TreePrinter {
 	}
 
 	private String writeAll(Node node) {
+		int width=node.calculateCharacterWidth();
 		String text = "";
 		text += writeSingleNode(node);
 		text += System.lineSeparator();
-		text += writeEdges(node.calculateCharacterWidth(), node.getBranches());
+		text += writeEdges(node.getBranches());
 		List<Node> subTrees = node.getSubTrees();
 		while (subTrees.size() > 0) {
 			text += writeNodes(node.calculateCharacterWidth(), subTrees);
 			text += System.lineSeparator();
-			text += writeEdges(node.calculateCharacterWidth(), getAllSubtreeEdgesUnified(subTrees));
-			subTrees = getAllSubtreeSubtreesUnified(subTrees);
+			text += writeEdges(getAllSubtreeEdgesUnified(width,subTrees));
+			subTrees = getAllSubtreeSubtreesUnified(width,subTrees);
 		}
 		return text;
 	}
 
-	private List<Node> getAllSubtreeSubtreesUnified(List<Node> subTrees) {
-		List<Node> allSubtrees = new ArrayList<>();
-		for (Node t : subTrees) {
-			allSubtrees.addAll(t.getSubTrees());
+	private String writeEdges(IEdge[] branches) {
+		String line = "";		
+		for (IEdge iEdge : branches) {
+			Value<?> val = iEdge.getValue();
+			int individualEdgeTreeWidth = iEdge.calculateCharacterWidth();
+			for (int i = 0; i < individualEdgeTreeWidth / 2 - 1; i++) {
+				line += " ";
+			}
+			if (val != null) {
+				line += "|";
+			} else {
+				line += " ";
+			}
+			for (int i = 0; i < individualEdgeTreeWidth / 2; i++) {
+				line += " ";
+			}
 		}
+		line += System.lineSeparator();
+		for (IEdge iEdge : branches) {
+			String text = "";
+			if (iEdge.getValue() != null) {
+				text = iEdge.getValue().toString();
+			}
+			int individualEdgeTreeWidth = iEdge.calculateCharacterWidth();
+			for (int i = 0; i < individualEdgeTreeWidth / 2 - text.length() / 2; i++) {
+				line += " ";
+			}
+			line += text;
+			for (int i = 0; i < individualEdgeTreeWidth / 2 - text.length() / 2; i++) {
+				line += " ";
+			}
+		}
+		line += System.lineSeparator();
+		for (IEdge iEdge : branches) {
+			Value<?> val = iEdge.getValue();
+			int individualEdgeTreeWidth = iEdge.calculateCharacterWidth();
+			for (int i = 0; i < individualEdgeTreeWidth / 2-1; i++) {
+				line += " ";
+			}
+			if (val != null) {
+				line += "|";
+			} else {
+				line += " ";
+			}
+			for (int i = 0; i < individualEdgeTreeWidth / 2; i++) {
+				line += " ";
+			}
+		}
+		line += System.lineSeparator();
+		return line;
+	}
+
+	private List<Node> getAllSubtreeSubtreesUnified(int parentWidth,List<Node> subTrees) {
+		
+		boolean terminate=true;
+		for (Node t : subTrees) {
+			if(t.getBranches().length>0) {
+				terminate=false;
+			}
+		}
+		List<Node> allSubtrees = new ArrayList<>();
+		if(!terminate) {
+			for (Node t : subTrees) {
+				IEdge[] edges = t.getBranches();
+				if(edges.length==0) {
+					allSubtrees.add(new PlaceholderNode(t.calculateCharacterWidth()));//Placeholder
+				}
+				allSubtrees.addAll(t.getSubTrees());
+			}
+		}		
 		return allSubtrees;
 	}
 
-	private IEdge[] getAllSubtreeEdgesUnified(List<Node> subTrees) {
+	private IEdge[] getAllSubtreeEdgesUnified(int parentWidth,List<Node> subTrees) {
 		List<IEdge> allEdges = new ArrayList<>();
 		for (Node t : subTrees) {
 			if (t.getBranches().length == 0) {
-				allEdges.add(new Edge());
+				allEdges.add(new PlaceholderEdge(t.calculateCharacterWidth()));
 			} else {
 				for (int i = 0; i < t.getBranches().length; i++) {
 					allEdges.add(t.getBranches()[i]);
@@ -61,6 +127,8 @@ public class TreePrinter {
 		String text = "";
 		if (node.getDecidingFeature() != null) {
 			text = node.getDecidingFeature().getName();
+		}else if(node.isLeafNode()){
+			text=node.getValue().toString();
 		}
 		for (int i = 0; i < treeWidthInCharacters / 2 - text.length() / 2; i++) {
 			line += " ";
@@ -96,7 +164,7 @@ public class TreePrinter {
 		}
 		for (IEdge iEdge : iEdges) {
 			Value<?> val = iEdge.getValue();
-			int individualEdgeTreeWidth = Math.max(treeWidthPerBranch, iEdge.calculateCharacterWidth());
+			int individualEdgeTreeWidth = Math.max(treeWidthPerBranch, iEdge.calculateCharacterWidth(parentCharacterWidth)/iEdges.length);
 			for (int i = 0; i < individualEdgeTreeWidth / 2; i++) {
 				line += " ";
 			}
@@ -115,7 +183,7 @@ public class TreePrinter {
 			if (iEdge.getValue() != null) {
 				text = iEdge.getValue().toString();
 			}
-			int individualEdgeTreeWidth = Math.max(treeWidthPerBranch, iEdge.calculateCharacterWidth());
+			int individualEdgeTreeWidth = Math.max(treeWidthPerBranch, iEdge.calculateCharacterWidth(parentCharacterWidth)/iEdges.length);
 			for (int i = 0; i < individualEdgeTreeWidth / 2 - text.length() / 2; i++) {
 				line += " ";
 			}
@@ -127,7 +195,7 @@ public class TreePrinter {
 		line += System.lineSeparator();
 		for (IEdge iEdge : iEdges) {
 			Value<?> val = iEdge.getValue();
-			int individualEdgeTreeWidth = Math.max(treeWidthPerBranch, iEdge.calculateCharacterWidth());
+			int individualEdgeTreeWidth = Math.max(treeWidthPerBranch, iEdge.calculateCharacterWidth(parentCharacterWidth)/iEdges.length);
 			for (int i = 0; i < individualEdgeTreeWidth / 2; i++) {
 				line += " ";
 			}

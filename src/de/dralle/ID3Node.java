@@ -13,6 +13,7 @@ public class ID3Node extends Node{
 	public void learn(DataSet d) {
 		LOGGER.log(Level.FINE, "Builduing ID3 desision tree for " + d.getSize() + " Features "
 				+ d.getData().size() + " feature vectors");
+		setValue(d.getMostCommonResult());
 		double entropy = d.getEntropy();
 		int fIndex = d.getMostDecidingFeatureIndex();
 		if (fIndex != -1) { //or entropy>0

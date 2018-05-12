@@ -8,5 +8,6 @@ public interface IEdge {
 	int calculateSubtreeWidth();
 	int calculateSubtreeDepth();
 	int calculateCharacterWidth();
+	int calculateCharacterWidth(int parentWidth);
 	
 }

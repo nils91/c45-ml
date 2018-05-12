@@ -11,6 +11,7 @@ public class Node implements INode{
 		branches=new ArrayList<>();
 	}
 	protected boolean leafNode;
+	private Value<?> result;
 	@Override
 	public boolean isLeafNode() {
 		return leafNode;
@@ -68,6 +69,22 @@ public class Node implements INode{
 		return total;
 	}
 
+	public int calculateCharacterWidth(int parentWidth) {
+		if(getDecidingFeature()!=null) {
+			String name=getDecidingFeature().getName();
+			int len = name.length()+2; //add space left an right
+			int branchWidth=0;
+			for (IEdge iEdge : branches) {
+				branchWidth+=iEdge.calculateCharacterWidth(parentWidth/branches.size());
+			}
+			int fullWidth = Math.max(len, branchWidth);
+			return fullWidth;
+		}else {
+			String value=getValue().toString();
+			int len = value.length()+2; //add space left an right
+			return Math.max(parentWidth, len);
+		}
+	}
 	public int calculateCharacterWidth() {
 		if(getDecidingFeature()!=null) {
 			String name=getDecidingFeature().getName();
@@ -78,8 +95,12 @@ public class Node implements INode{
 			}
 			int fullWidth = Math.max(len, branchWidth);
 			return fullWidth;
+		}else if(isLeafNode()){
+			String value=getValue().toString();
+			int len = value.length()+2; //add space left an right
+			return len;
 		}
-		return 2;
+		return 0;
 	}
 /**
  * Gets this Nodes childnodes while ignoring edges
@@ -92,5 +113,17 @@ public class Node implements INode{
 		}
 		return childNodes;
 	}
+
+@Override
+public Value<?> getValue() {	
+	return result;
+}
+
+@Override
+public Value<?> setValue(Value<?> v) {
+	Value<?> prevV = result;
+	result=v;
+	return prevV;
+}
 	
 }

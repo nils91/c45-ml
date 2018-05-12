@@ -20,7 +20,7 @@ public class TreePrinter {
 	private String writeAll(Node node) {
 		int width=node.calculateCharacterWidth();
 		String text = "";
-		text += writeSingleNode(node);
+		text += writeSingleNode(width,node);
 		text += System.lineSeparator();
 		text += writeEdges(node.getBranches());
 		List<Node> subTrees = node.getSubTrees();
@@ -53,10 +53,15 @@ public class TreePrinter {
 		line += System.lineSeparator();
 		for (IEdge iEdge : branches) {
 			String text = "";
+			int individualEdgeTreeWidth = iEdge.calculateCharacterWidth();
 			if (iEdge.getValue() != null) {
 				text = iEdge.getValue().toString();
+			}else {
+				for (int i = 0; i < individualEdgeTreeWidth; i++) {
+					text+=" ";
+				}
 			}
-			int individualEdgeTreeWidth = iEdge.calculateCharacterWidth();
+			
 			for (int i = 0; i < individualEdgeTreeWidth / 2 - text.length() / 2; i++) {
 				line += " ";
 			}
@@ -98,7 +103,7 @@ public class TreePrinter {
 			for (Node t : subTrees) {
 				IEdge[] edges = t.getBranches();
 				if(edges.length==0) {
-					allSubtrees.add(new PlaceholderNode(t.calculateCharacterWidth()));//Placeholder
+					allSubtrees.add(new PlaceholderNode(parentWidth/subTrees.size()));//Placeholder
 				}
 				allSubtrees.addAll(t.getSubTrees());
 			}
@@ -110,7 +115,7 @@ public class TreePrinter {
 		List<IEdge> allEdges = new ArrayList<>();
 		for (Node t : subTrees) {
 			if (t.getBranches().length == 0) {
-				allEdges.add(new PlaceholderEdge(t.calculateCharacterWidth()));
+				allEdges.add(new PlaceholderEdge(parentWidth/subTrees.size()));
 			} else {
 				for (int i = 0; i < t.getBranches().length; i++) {
 					allEdges.add(t.getBranches()[i]);
@@ -121,9 +126,9 @@ public class TreePrinter {
 		return allEdges.toArray(new IEdge[allEdges.size()]);
 	}
 
-	private String writeSingleNode(Node node) {
+	private String writeSingleNode(int parentCharacterWidth,Node node) {
 		String line = "";
-		int treeWidthInCharacters = node.calculateCharacterWidth();
+		int treeWidthInCharacters = Math.max(node.calculateCharacterWidth(),parentCharacterWidth);
 		String text = "";
 		if (node.getDecidingFeature() != null) {
 			text = node.getDecidingFeature().getName();
@@ -144,7 +149,7 @@ public class TreePrinter {
 		String line = "";
 		String[] parts = new String[nodes.size()];
 		for (int i = 0; i < parts.length; i++) {
-			parts[i] = writeSingleNode(nodes.get(i));
+			parts[i] = writeSingleNode(parentCharacterWidth/parts.length,nodes.get(i));
 		}
 		int widthForOnePart = parentCharacterWidth;
 		if (nodes.size() > 0) {

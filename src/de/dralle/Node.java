@@ -81,5 +81,16 @@ public class Node implements INode{
 		}
 		return 2;
 	}
+/**
+ * Gets this Nodes childnodes while ignoring edges
+ * @return
+ */
+	public List<Node> getSubTrees() {
+		List<Node> childNodes=new ArrayList<>();
+		for (IEdge edge : branches) {
+			childNodes.add(edge.getSubTree());			
+		}
+		return childNodes;
+	}
 	
 }

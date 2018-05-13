@@ -68,11 +68,24 @@ public class Main {
 			LOGGER.log(Level.CONFIG, featureVectors.size() + " feature vectors");
 			DataSet trainDataSet=new DataSet();
 			trainDataSet.setSize(features.length);
-			DiscrceteResultFeature<String> resultFeature=new DiscrceteResultFeature<>();
+			DiscrceteResultFeature<Boolean> resultFeature=new DiscrceteResultFeature<>();
 			resultFeature.setName(features[features.length - 1]);
 			trainDataSet.setFeature(resultFeature, features.length-1);
 			for (int i = 0; i < features.length-1; i++) {
-				DiscreteFeature<String> feature=new DiscreteFeature<>();
+				AbstractFeature<?> feature=null;
+				switch(i) {
+				case 3:
+					feature=new DiscreteFeature<Boolean>(features[i]);
+					break;
+				case 1:
+				case 2:
+					feature=new ContinuousFeature<Integer>(features[i]);
+					break;
+				case 0:
+				default:
+					feature=new DiscreteFeature<String>(features[i]);
+					break;
+				}
 				feature.setName(features[i]);
 				trainDataSet.setFeature(feature, i);
 			}
@@ -81,7 +94,21 @@ public class Main {
 				FeatureVector vector=new FeatureVector();
 				vector.setSize(values.length);
 				for (int j = 0; j < values.length; j++) {
-					Value<String> value=new Value<>(values[j]);
+					Value<?> value=null;
+					switch(j) {
+					case 3:
+					case 4:
+						value=new Value<Boolean>(Boolean.parseBoolean(values[j]));
+						break;
+					case 1:
+					case 2:
+						value=new Value<Integer>(Integer.parseInt(values[j]));
+						break;
+					case 0:
+					default:
+						value=new Value<String>(values[j]);
+						break;
+					}
 					value.setFeature(trainDataSet.getFeature(j));
 					trainDataSet.getFeature(j).addValue(value);
 					vector.setFeature(trainDataSet.getFeature(j), j);

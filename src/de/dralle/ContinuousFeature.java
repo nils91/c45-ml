@@ -38,6 +38,18 @@ public class ContinuousFeature<T extends Number> extends AbstractFeature<T> {
 		}
 		return new ValueRange<T>(min, max);
 	}
+	public T getMedian() {
+		T sum=uncheckedCast(new Double(0));
+		List<Value<?>> allValues = getValues();
+		for (Value<?> value : allValues) {
+			Object valueObj = value.getValue();
+			if(valueObj instanceof Number) {
+				Number valueNumber=(Number)valueObj;
+				sum=uncheckedCast(new Double(sum.doubleValue()+valueNumber.doubleValue()));
+			}
+		}
+		return uncheckedCast(new Double(sum.doubleValue()/allValues.size()));
+	}
 	private T uncheckedCast(Number valueNumber) {
 		return (T)valueNumber;
 	}

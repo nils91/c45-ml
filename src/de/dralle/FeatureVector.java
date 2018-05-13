@@ -20,12 +20,12 @@ public class FeatureVector {
 		FeatureVector newVector=new FeatureVector();
 		newVector.setSize(getSize()-1);
 		for (int i = 0; i < features.length-1; i++) {
-			if(i<0) {
+			if(i<index) {
 				newVector.setFeature(features[i], i);
 				
 				newVector.setValue(values[i], i);
 			}
-			if(i>=0) {
+			if(i>=index) {
 				newVector.setFeature(features[i+1], i);				
 
 				newVector.setValue(values[i+1], i);

@@ -14,4 +14,7 @@ public class ValueRange<T extends Number> {
 	public T getMax() {
 		return max;
 	}
+	public T getAverage() {
+		return (T)new Double((min.doubleValue()+max.doubleValue())/2);
+	}
 }

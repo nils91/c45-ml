@@ -24,7 +24,7 @@ public class Main {
 		ConsoleHandler logHandler = new ConsoleHandler();
 		logHandler.setLevel(Level.ALL);
 		Logger.getGlobal().addHandler(logHandler);
-		File f = new File(".\\testdata\\ID3_Beispieldaten.csv");
+		File f = new File(".\\testdata\\C45_Beispieldaten.csv");
 		if (f.exists()) {
 			LOGGER.log(Level.CONFIG, "File exists");
 			BufferedReader br = null;

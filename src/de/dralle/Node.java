@@ -88,7 +88,7 @@ public class Node implements INode{
 	public int calculateCharacterWidth() {
 		if(getDecidingFeature()!=null) {
 			String name=getDecidingFeature().getName();
-			int len = name.length()+2; //add space left an right
+			int len = name.length(); //add space left an right
 			int branchWidth=0;
 			for (IEdge iEdge : branches) {
 				branchWidth+=iEdge.calculateCharacterWidth();
@@ -97,7 +97,7 @@ public class Node implements INode{
 			return fullWidth;
 		}else if(isLeafNode()){
 			String value=getValue().toString();
-			int len = value.length()+2; //add space left an right
+			int len = value.length(); //add space left an right
 			return len;
 		}
 		return 0;

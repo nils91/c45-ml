@@ -53,9 +53,10 @@ public class TreePrinter {
 		line += System.lineSeparator();
 		for (IEdge iEdge : branches) {
 			String text = "";
-			int individualEdgeTreeWidth = iEdge.calculateCharacterWidth();
+			int individualEdgeTreeWidth = iEdge.calculateCharacterWidth()-2;
 			if (iEdge.getValue() != null) {
 				text = iEdge.getValue().toString();
+				text = "|" + text + "|";
 			}else {
 				for (int i = 0; i < individualEdgeTreeWidth; i++) {
 					text+=" ";
@@ -135,6 +136,10 @@ public class TreePrinter {
 		}else if(node.isLeafNode()){
 			text=node.getValue().toString();
 		}
+		if(!text.equals("")) {
+			text="|"+text+"|";
+		}
+		
 		for (int i = 0; i < treeWidthInCharacters / 2 - text.length() / 2; i++) {
 			line += " ";
 		}

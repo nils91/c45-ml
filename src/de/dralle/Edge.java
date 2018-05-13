@@ -54,7 +54,7 @@ public class Edge implements IEdge {
 	public int calculateCharacterWidth(int parentWidth) {
 		int len=0;
 		if(value!=null) {
-			len=value.toString().length()+2;//spaces left right
+			len=value.toString().length();//spaces left right
 			int fullWidth=Math.max(len,  parentWidth);
 			if(subTree!=null) {
 				fullWidth=Math.max(len, subTree.calculateCharacterWidth(parentWidth));

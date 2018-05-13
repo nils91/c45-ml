@@ -261,7 +261,7 @@ public class DataSet {
 		AbstractFeature<?> objectivlyBestFeature = null;
 		double featureInformationGain = 0;
 		for (int i = 0; i < features.length-1; i++) { //exclude result feature
-			double gain = features[i].getInformationGainRatio(this);
+			double gain = features[i].getInformationGain(this);
 			if (gain > featureInformationGain) {
 				objectivlyBestFeature = features[i];
 				featureInformationGain = gain;
